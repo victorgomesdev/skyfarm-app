@@ -1,25 +1,50 @@
-import Theme from '@/constants/Theme';
+import { useEffect } from 'react';
 import { Stack } from 'expo-router';
+import { Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { PaperProvider } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import Theme from '@/constants/Theme';
+import SupabaseProvider from '@/shared/supabase';
+import useAuth from '@/hooks/useAuth';
+import useSession from '@/hooks/useSession';
 
 export default function RootLayout() {
 
+  const auth = useAuth()
+  const session = useSession()
+
+  useEffect(() => {
+    if (!auth) return
+    async function doLogin() {
+      const res = await auth?.signInWithPassword({
+        email: "teste@teste.com",
+        password: "123456",
+      })
+
+      if (res?.error) Alert.alert('erro', res.error.cause as string)
+    }
+
+    doLogin()
+  }, [auth])
+
+  useEffect(() => {
+
+    if (!session) return
+
+    Alert.alert('s', session.access_token)
+
+  }, [session])
+
   return (
-    <PaperProvider theme={Theme}>
-      <StatusBar style="auto" backgroundColor={Theme.colors?.primary} />
-      <SafeAreaView />
-      <Stack screenOptions={{
-        headerTintColor: "#ffffff",
-        headerStyle: {
-          backgroundColor: Theme.colors?.primary
-        }
-      }}>
-        <Stack.Screen name="webview" options={{
-          headerTitle: "Definir área",
-        }} />
-      </Stack>
-    </PaperProvider>
+    <SupabaseProvider>
+      <PaperProvider theme={Theme}>
+        <StatusBar style="auto" backgroundColor={Theme.colors?.primary} />
+        <Stack screenOptions={{
+          headerShown: false
+        }}>
+          <Stack.Screen name='(tabs)' />
+        </Stack>
+      </PaperProvider>
+    </SupabaseProvider>
   );
 }
