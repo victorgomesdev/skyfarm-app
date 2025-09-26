@@ -1,28 +1,28 @@
-import Screen from "@/components/Screen"
-import Theme from "@/constants/Theme"
-import theme from "@/constants/Theme"
 import { useState } from "react"
 import { Alert, StyleSheet, View } from "react-native"
 import { Button } from 'react-native-paper'
 import { WebView, WebViewMessageEvent } from 'react-native-webview'
+import Screen from "@/components/Screen"
+import Theme from "@/constants/Theme"
+import theme from "@/constants/Theme"
 
 const WebViewScreen = () => {
-
     const [coords, setCoords] = useState<string | null>(null)
 
     const handleMessage = ({ nativeEvent: { data } }: WebViewMessageEvent) => {
-        if (data === 'null') {
-            setCoords(null)
-        } else {
+        if (data != "null") {
             setCoords(data)
+            return
         }
+
+        setCoords(null)
     }
 
     return (
         <Screen>
             <View style={styles.controls}>
                 <Button
-                    onPress={() => {  }}
+                    onPress={() => { }}
                     mode="contained"
                     buttonColor={Theme.colors?.error}>Cancelar</Button>
                 <Button
@@ -32,7 +32,7 @@ const WebViewScreen = () => {
                     mode="contained">Continuar</Button>
             </View>
             <WebView
-            
+
                 nestedScrollEnabled={false}
                 scrollEnabled={false}
                 onMessage={handleMessage}
