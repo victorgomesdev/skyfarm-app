@@ -8,7 +8,9 @@ const Screen = ({ children }: PropsWithChildren) => {
             style={{
                 flex: 1,
                 paddingTop: 9,
-                backgroundColor: theme.colors?.background
+                backgroundColor: theme.colors?.background,
+                flexDirection: 'column',
+                alignItems: 'center'
             }}>
             {children}
         </View>

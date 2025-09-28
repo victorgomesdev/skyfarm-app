@@ -1,12 +1,8 @@
 import { Tabs } from "expo-router"
-import { MaterialIcons } from '@expo/vector-icons'
 import Theme from "@/constants/Theme"
 import TabBar from "@/components/TabBar"
 
-const ROUTES = ["Projetos", "Nova área", "Perfil"]
-
 const TabLayout = () => {
-
     return (
         <Tabs
             initialRouteName="projects"
@@ -16,10 +12,14 @@ const TabLayout = () => {
                 },
                 headerTintColor: '#ffffff'
             }}
-            tabBar={(props) => (<TabBar descriptors={props.descriptors} state={props.state} navigation={props.navigation} insets={props.insets}/>)}>
-            <Tabs.Screen name="projects" />
-            <Tabs.Screen name="new_area"/>
-            <Tabs.Screen name="profile"/>            
+            tabBar={(props) => {
+                return (
+                    <TabBar descriptors={props.descriptors} state={props.state} navigation={props.navigation} insets={props.insets} />
+                )
+            }}>
+            <Tabs.Screen name="projects" options={{ headerTitle: 'Projetos' }} />
+            <Tabs.Screen name="new_area" options={{ headerTitle: 'Nova área' }} />
+            <Tabs.Screen name="profile" options={{ headerTitle: 'Perfil' }} />
         </Tabs>
     )
 }

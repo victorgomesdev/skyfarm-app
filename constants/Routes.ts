@@ -1,4 +1,5 @@
-export enum Routes {
-    projects = "Projetos",
-    new_area = "Nova área"
+export const TabRoutes: any = {
+    projects: 'Projetos',
+    new_area: 'Nova área',
+    profile: 'Perfil'
 }
