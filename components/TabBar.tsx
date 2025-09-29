@@ -11,7 +11,7 @@ const TabBar = (props: BottomTabBarProps) => {
   const { buildHref } = useLinkBuilder();
 
   return (
-    <View style={{ flexDirection: 'row', height: 70, alignItems: 'center', width: '100%' }}>
+    <View style={{ flexDirection: 'row', height: 70, alignItems: 'center', width: '100%', justifyContent: 'space-around' }}>
       {props.state.routes.map((route, index) => {
         const { options } = props.descriptors[route.key];
         const label = TabRoutes[route.name]
@@ -45,6 +45,7 @@ const TabBar = (props: BottomTabBarProps) => {
             onPress={onPress}
             onLongPress={onLongPress}
             style={styles.tabButton}
+            key={route.name}
           >
             <FontAwesome
               name={route.name == 'projects' ? 'map' : route.name == 'new_area' ? 'plus-circle' : 'user'}

@@ -1,8 +1,13 @@
+import { useContext } from "react"
 import { Tabs } from "expo-router"
 import Theme from "@/constants/Theme"
 import TabBar from "@/components/TabBar"
+import { SupabaseContext } from "@/shared/supabase"
 
 const TabLayout = () => {
+
+    const { loading } = useContext(SupabaseContext)
+
     return (
         <Tabs
             initialRouteName="projects"
@@ -10,7 +15,8 @@ const TabLayout = () => {
                 headerStyle: {
                     backgroundColor: Theme.colors?.primary
                 },
-                headerTintColor: '#ffffff'
+                headerTintColor: '#ffffff',
+                animation: 'shift'
             }}
             tabBar={(props) => {
                 return (
@@ -19,7 +25,6 @@ const TabLayout = () => {
             }}>
             <Tabs.Screen name="projects" options={{ headerTitle: 'Projetos' }} />
             <Tabs.Screen name="new_area" options={{ headerTitle: 'Nova área' }} />
-            <Tabs.Screen name="profile" options={{ headerTitle: 'Perfil' }} />
         </Tabs>
     )
 }

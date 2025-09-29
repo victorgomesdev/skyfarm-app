@@ -6,12 +6,10 @@ import { PaperProvider } from 'react-native-paper';
 import Theme from '@/constants/Theme';
 import SupabaseProvider from '@/shared/supabase';
 import useAuth from '@/hooks/useAuth';
-import useSession from '@/hooks/useSession';
 
 export default function RootLayout() {
 
   const auth = useAuth()
-  const session = useSession()
 
   useEffect(() => {
     if (!auth) return
@@ -26,14 +24,6 @@ export default function RootLayout() {
 
     doLogin()
   }, [auth])
-
-  useEffect(() => {
-
-    if (!session) return
-
-    Alert.alert('s', session.access_token)
-
-  }, [session])
 
   return (
     <SupabaseProvider>

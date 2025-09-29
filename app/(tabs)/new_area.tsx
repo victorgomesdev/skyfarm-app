@@ -5,9 +5,14 @@ import { WebView, WebViewMessageEvent } from 'react-native-webview'
 import Screen from "@/components/Screen"
 import Theme from "@/constants/Theme"
 import theme from "@/constants/Theme"
+import { useRouter } from "expo-router"
+import useAuth from "@/hooks/useAuth"
 
 const WebViewScreen = () => {
     const [coords, setCoords] = useState<string | null>(null)
+    const [loaded, setLoaded] = useState(false)
+    const router = useRouter()
+    const auth = useAuth()
 
     const handleMessage = ({ nativeEvent: { data } }: WebViewMessageEvent) => {
         if (data != "null") {
@@ -18,21 +23,34 @@ const WebViewScreen = () => {
         setCoords(null)
     }
 
+    const sendData = async ()=> {
+        await fetch(process.env.EXPO_PUBLIC_API_URL as string + '/area/create', {
+            method: 'post',
+            headers: {
+                "Content-Type": 'application/json'
+            },
+            body: JSON.stringify({
+                coords: coords,
+                userID: (await auth?.getSession())?.data.session?.access_token
+            })
+        })
+    }
+    
     return (
         <Screen>
             <View style={styles.controls}>
                 <Button
-                    onPress={() => { }}
+                    onPress={() => router.back()}
                     mode="contained"
                     buttonColor={Theme.colors?.error}>Cancelar</Button>
                 <Button
                     disabled={coords == null}
                     buttonColor={theme.colors?.primary}
-                    onPress={() => { Alert.alert('oi') }}
+                    onPress={sendData}
                     mode="contained">Continuar</Button>
             </View>
             <WebView
-
+                style={{ flex: 1 }}
                 nestedScrollEnabled={false}
                 scrollEnabled={false}
                 onMessage={handleMessage}
