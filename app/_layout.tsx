@@ -6,6 +6,7 @@ import { PaperProvider } from 'react-native-paper';
 import Theme from '@/constants/Theme';
 import SupabaseProvider from '@/shared/supabase';
 import useAuth from '@/hooks/useAuth';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
 
@@ -26,15 +27,17 @@ export default function RootLayout() {
   }, [auth])
 
   return (
-    <SupabaseProvider>
-      <PaperProvider theme={Theme}>
-        <StatusBar style="auto" backgroundColor={Theme.colors?.primary} />
-        <Stack screenOptions={{
-          headerShown: false
-        }}>
-          <Stack.Screen name='(tabs)' />
-        </Stack>
-      </PaperProvider>
-    </SupabaseProvider>
+    <SafeAreaView style={{flex: 1}}>
+      <SupabaseProvider>
+        <PaperProvider theme={Theme}>
+          <Stack screenOptions={{
+            headerShown: false
+          }}>
+            <Stack.Screen name='(tabs)' />
+          </Stack>
+        </PaperProvider>
+        <StatusBar backgroundColor={Theme.colors?.primary} style='auto' />
+      </SupabaseProvider>
+    </SafeAreaView>
   );
 }
