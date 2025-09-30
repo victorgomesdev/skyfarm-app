@@ -14,7 +14,7 @@ const TabBar = (props: BottomTabBarProps) => {
     <View style={{ flexDirection: 'row', height: 70, alignItems: 'center', width: '100%', justifyContent: 'space-around' }}>
       {props.state.routes.map((route, index) => {
         const { options } = props.descriptors[route.key];
-        const label = TabRoutes[route.name]
+        const label = TabRoutes[index]
 
         const isFocused = props.state.index === index;
 
@@ -48,7 +48,7 @@ const TabBar = (props: BottomTabBarProps) => {
             key={route.name}
           >
             <FontAwesome
-              name={route.name == 'projects' ? 'map' : route.name == 'new_area' ? 'plus-circle' : 'user'}
+              name={TabRoutes[index] == 'Projetos'? 'map': 'gear'}
               size={25}
               color={isFocused ? Theme.colors?.primary : Theme.colors?.backdrop} />
             <Text style={{ color: isFocused ? Theme.colors?.primary : Theme.colors?.backdrop }}>
