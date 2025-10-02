@@ -3,7 +3,10 @@ import { SupabaseContext } from "@/shared/supabase"
 
 const useAuth = () => {
     const ctx = useContext(SupabaseContext)
-    return ctx.client?.auth ?? null
+    return {
+        auth: ctx.auth,
+        session: ctx.session
+    }
 }
 
 export default useAuth

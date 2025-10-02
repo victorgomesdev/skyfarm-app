@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
+import { SupabaseAuthClient } from "@supabase/supabase-js/dist/module/lib/SupabaseAuthClient"
 import { useRouter } from 'expo-router'
 import { createContext, PropsWithChildren, useEffect, useState } from 'react'
 import { AppState } from 'react-native'
@@ -7,15 +8,17 @@ import { AppState } from 'react-native'
 type SupabaseCtx = {
   client: SupabaseClient | null,
   session: Session | null,
+  auth: SupabaseAuthClient | null
   loading: boolean
 }
 
-export const SupabaseContext = createContext<SupabaseCtx>({ client: null, session: null, loading: true })
+export const SupabaseContext = createContext<SupabaseCtx>({ client: null, session: null, loading: true, auth: null })
 
 const SupabaseProvider = ({ children }: PropsWithChildren) => {
 
   const [client, setClient] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
+  const [auth, setAuth] = useState<SupabaseAuthClient | null>(null)
   const [loading, setLoading] = useState(true)
 
   const navigation = useRouter()
@@ -32,6 +35,7 @@ const SupabaseProvider = ({ children }: PropsWithChildren) => {
     })
 
     setClient(sp)
+    setAuth(sp.auth)
 
     sp.auth.getSession().then(s => setSession(s.data.session))
 
@@ -79,7 +83,7 @@ const SupabaseProvider = ({ children }: PropsWithChildren) => {
   }, [session])
 
   return (
-    <SupabaseContext.Provider value={{ client, session, loading }}>
+    <SupabaseContext.Provider value={{ client, session, loading, auth }}>
       {children}
     </SupabaseContext.Provider>
   )

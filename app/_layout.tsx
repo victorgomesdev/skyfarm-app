@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
 
-  const auth = useAuth()
+  const { auth } = useAuth()
 
   useEffect(() => {
     if (!auth) return
@@ -27,7 +27,7 @@ export default function RootLayout() {
   }, [auth])
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <SupabaseProvider>
         <PaperProvider theme={Theme}>
           <Stack screenOptions={{
