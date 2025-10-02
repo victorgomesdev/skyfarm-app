@@ -15,6 +15,7 @@ const AppLayout = () => {
             }}>
             <Stack.Screen name="areas" options={{ headerShown: true, headerTitle: 'Áreas' }} />
             <Stack.Screen name="projects" options={{ headerShown: true, headerTitle: 'Projetos' }} />
+            
         </Stack>
     )
 }

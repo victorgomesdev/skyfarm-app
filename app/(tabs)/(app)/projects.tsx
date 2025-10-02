@@ -1,25 +1,36 @@
 import { useEffect, useState } from "react"
-import { Text, FlatList, StyleSheet, Dimensions, Pressable } from "react-native"
-import { ActivityIndicator, Snackbar, FAB } from "react-native-paper"
+import { Dimensions, FlatList, Modal, Pressable, StyleSheet, View } from "react-native"
+import { ActivityIndicator, Button, FAB, Snackbar, Text, TextInput } from "react-native-paper"
 import { useRouter } from "expo-router"
+import ProjectCard from "@/components/ProjectCard"
 import Screen from "@/components/Screen"
+import Theme from "@/constants/Theme"
 import useClient from "@/hooks/useClient"
 import { ProjectResponse } from "@/shared/types/project"
-import ProjectCard from "@/components/ProjectCard"
-import Theme from "@/constants/Theme"
 
-const { width } = Dimensions.get("window")
+const { width, height } = Dimensions.get("window")
 const CARD_MARGIN = 4
 const CARD_WIDTH = (width / 2) - CARD_MARGIN * 3
+const MODAL_HEIGHT = height * 0.3
 
 const ProjectsScreen = () => {
+
   const [projects, setProjects] = useState<ProjectResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [snackBarVisible, setVisible] = useState(false)
+  const [modal, setModal] = useState(false)
+  const [newProject, setNewProject] = useState('')
+
   const client = useClient()
   const router = useRouter()
 
   const onDissMissSnack = (): void => setVisible(false)
+
+  const handleModal = (): void => setModal(!modal)
+
+  const handleInput = (name: string): void => {
+    setNewProject(name)
+  }
 
   const onProjectSelected = (projectId: string): void => {
 
@@ -81,16 +92,68 @@ const ProjectsScreen = () => {
         Ocorreu um erro ao listar os projetos.
       </Snackbar>
       <FAB
-      color="#ffffff"
-      style={{
-        position: 'absolute',
-        bottom: 8,
-        right: 10,
-        backgroundColor: Theme.colors?.primary,
-      }}
+        color="#ffffff"
+        style={{
+          position: 'absolute',
+          bottom: 8,
+          right: 10,
+          backgroundColor: Theme.colors?.primary,
+        }}
         icon="plus"
-        onPress={() => console.log('Pressed')}
+        onPress={handleModal}
       />
+      <Modal
+        transparent={true}
+        visible={modal}
+        animationType="slide"
+        onRequestClose={handleModal}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            flexDirection: 'column'
+          }}>
+          <View
+            style={{
+              backgroundColor: Theme.colors?.background,
+              height: MODAL_HEIGHT,
+              width: width,
+              borderTopRightRadius: 20,
+              borderTopLeftRadius: 20,
+              flexDirection: 'column',
+              padding: 10,
+              gap: 15,
+              alignItems: 'center',
+            }}>
+            <View
+              style={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+              }}>
+              <Text variant="titleLarge" style={{ alignSelf: 'center' }}>Novo Projeto</Text>
+              <TextInput mode="outlined" label={"Nome"} value={newProject} onChangeText={handleInput} />
+            </View>
+            <View style={{
+              width: '90%',
+              gap: 10,
+            }}>
+              <Button
+                onPress={handleModal}
+                buttonColor={Theme.colors?.primary}
+                textColor="white">Criar novo projeto</Button>
+              <Button
+                onPress={handleModal}
+                mode="elevated"
+                textColor={Theme.colors?.error}>Cancelar</Button>
+            </View>
+
+          </View>
+        </View>
+      </Modal>
     </Screen>
   )
 }
