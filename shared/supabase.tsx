@@ -1,9 +1,9 @@
+import { createContext, PropsWithChildren, useEffect, useState } from 'react'
+import { AppState } from 'react-native'
+import { useRouter } from 'expo-router'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { SupabaseAuthClient } from "@supabase/supabase-js/dist/module/lib/SupabaseAuthClient"
-import { useRouter } from 'expo-router'
-import { createContext, PropsWithChildren, useEffect, useState } from 'react'
-import { AppState } from 'react-native'
 
 type SupabaseCtx = {
   client: SupabaseClient | null,
@@ -37,16 +37,23 @@ const SupabaseProvider = ({ children }: PropsWithChildren) => {
     setClient(sp)
     setAuth(sp.auth)
 
-    sp.auth.getSession().then(s => setSession(s.data.session))
-
     const { data: { subscription } } = sp.auth.onAuthStateChange((event, session) => {
 
-      switch (event) {
-        case "INITIAL_SESSION": setSession(session); break;
-        case 'SIGNED_IN': setSession(session); break;
-        case 'TOKEN_REFRESHED': setSession(session); break;
-        case 'SIGNED_OUT': setSession(null); break;
+      if (['INITIAL_SESSION', 'SIGNED_IN', 'TOKEN_REFRESHED'].includes(event)) {
+        setSession(session)
+        setLoading(false)
+        return
       }
+
+      setSession(null)
+      //navigation.replace('/projects')
+
+      // switch (event) {
+      //   case "INITIAL_SESSION": setSession(session); break;
+      //   case 'SIGNED_IN': setSession(session); break;
+      //   case 'TOKEN_REFRESHED': setSession(session); break;
+      //   case 'SIGNED_OUT': setSession(null); break;
+      // }
     })
 
     const stateSubscription = AppState.addEventListener('change', (state) => {
@@ -60,6 +67,8 @@ const SupabaseProvider = ({ children }: PropsWithChildren) => {
             setLoading(false)
             navigation.replace('/projects')
           }
+
+          setLoading(false)
         }
       })()
     })
@@ -70,17 +79,17 @@ const SupabaseProvider = ({ children }: PropsWithChildren) => {
     }
   }, [])
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    if (session) {
-      setLoading(false)
-      return
-    }
+  //   if (session) {
+  //     setLoading(false)
+  //     return
+  //   }
 
-    setLoading(false)
-    // navigation.replace('/projects')
+  //   setLoading(false)
+  //   // navigation.replace('/projects')
 
-  }, [session])
+  // }, [session])
 
   return (
     <SupabaseContext.Provider value={{ client, session, loading, auth }}>
