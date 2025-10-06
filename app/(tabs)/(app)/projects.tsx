@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Dimensions, FlatList, Modal, Pressable, StyleSheet, View } from "react-native"
+import { Dimensions, FlatList, Keyboard, Modal, Pressable, StyleSheet, View } from "react-native"
 import { ActivityIndicator, Button, FAB, Snackbar, Text, TextInput } from "react-native-paper"
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useRouter } from "expo-router"
@@ -43,6 +43,7 @@ const ProjectsScreen = () => {
       setModal(true)
       translateY.value = withTiming(0, { duration: 200 })
     } else {
+      Keyboard.dismiss()
       translateY.value = withTiming(MODAL_HEIGHT, { duration: 200 })
       setTimeout(() => setModal(false), 200)
       setNewProject('')
@@ -68,6 +69,8 @@ const ProjectsScreen = () => {
     console.log(response)
 
     if(error){
+      handleModal()
+      setCreating(false)
       setVisible(true)
       return
     } 
@@ -126,6 +129,7 @@ const ProjectsScreen = () => {
           label: 'Fechar',
           onPress: () => setVisible(false)
         }}
+        style={{zIndex: 9999}}
         visible={snackBarVisible}
         onDismiss={onDissMissSnack}
       >

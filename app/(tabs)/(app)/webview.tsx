@@ -1,20 +1,21 @@
 import { useState } from "react"
 import { Alert, StyleSheet, View } from "react-native"
-import { Button } from 'react-native-paper'
+import { ActivityIndicator, Button } from 'react-native-paper'
 import { WebView, WebViewMessageEvent } from 'react-native-webview'
+import { useRouter, useLocalSearchParams } from "expo-router"
 import Screen from "@/components/Screen"
 import Theme from "@/constants/Theme"
 import theme from "@/constants/Theme"
-import { useRouter } from "expo-router"
-import useAuth from "@/hooks/useAuth"
 
 const WebViewScreen = () => {
+
     const [coords, setCoords] = useState<string | null>(null)
     const [loaded, setLoaded] = useState(false)
-    const router = useRouter()
-    const auth = useAuth()
 
-    const handleMessage = ({ nativeEvent: { data } }: WebViewMessageEvent) => {
+    const router = useRouter()
+    const params = useLocalSearchParams()
+
+    const handleMessage = ({ nativeEvent: { data } }: WebViewMessageEvent): void => {
         if (data != "null") {
             setCoords(data)
             return
@@ -23,21 +24,34 @@ const WebViewScreen = () => {
         setCoords(null)
     }
 
-    // const sendData = async ()=> {
-    //     await fetch(process.env.EXPO_PUBLIC_API_URL as string + '/area/create', {
-    //         method: 'post',
-    //         headers: {
-    //             "Content-Type": 'application/json'
-    //         },
-    //         body: JSON.stringify({
-    //             coords: coords,
-    //             userID: (await auth?.getSession())?.data.session?.access_token
-    //         })
-    //     })
-    // }
-    
+    const handleCreate = (): void => {
+
+        router.navigate({
+            pathname: '/define_params',
+            params: {
+                name: params.name,
+                coords: coords,
+                project_id: params.project_id
+            }
+        })
+    }
+
     return (
         <Screen>
+            <View style={{
+                position: 'absolute',
+                zIndex: 9999,
+                flex: 1,
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                height: '100%',
+                backgroundColor: Theme.colors?.background,
+                display: loaded ? 'none' : 'flex'
+            }}>
+                <ActivityIndicator size={'large'} />
+            </View>
             <View style={styles.controls}>
                 <Button
                     onPress={() => router.back()}
@@ -46,13 +60,15 @@ const WebViewScreen = () => {
                 <Button
                     disabled={coords == null}
                     buttonColor={theme.colors?.primary}
-                    mode="contained">Continuar</Button>
+                    mode="contained"
+                    onPress={handleCreate}>Continuar</Button>
             </View>
             <WebView
                 style={{ flex: 1 }}
                 nestedScrollEnabled={false}
                 scrollEnabled={false}
                 onMessage={handleMessage}
+                onLoad={() => setLoaded(true)}
                 source={{
                     uri: 'https://skyfarm-webview.vercel.app'
                 }} />
