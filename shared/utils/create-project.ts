@@ -1,4 +1,3 @@
-import useSession from "@/hooks/useSession"
 
 export async function createNewProject(projectName: string, token: string) {
 
@@ -16,15 +15,15 @@ export async function createNewProject(projectName: string, token: string) {
                 name: projectName
             })
         }).then(async (r) => {
-            if(r.status == 200){
+            if(r.status === 201){
                 response = true
                 return
             }
 
-            response = await r.json()
+            error =  'Ocorreu um erro inesperado.'
         })
     } catch (err) {
-        error = "Ocorreu um erro inesperado."
+        error = err
     }
 
     return { response, error }

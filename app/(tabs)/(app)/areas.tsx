@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { FlatList, StyleSheet, Dimensions, View, Modal, Keyboard } from "react-native"
+import { FlatList, StyleSheet, Dimensions, View, Modal, Keyboard, Pressable } from "react-native"
 import { ActivityIndicator, Snackbar, FAB, Button, TextInput, Text } from "react-native-paper"
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { useLocalSearchParams, useRouter } from "expo-router"
@@ -46,6 +46,17 @@ const AreasScreen = () => {
       setTimeout(() => setModal(false), 200)
       setNewArea('')
     }
+  }
+
+  const onAreaSelected = (id: string): void => {
+
+    router.push({
+      pathname: '/details',
+      params: {
+        project_id: project_id,
+        area_id: id
+      }
+    })
   }
 
   const handleCreate = (): void => {
@@ -101,9 +112,9 @@ const AreasScreen = () => {
           columnWrapperStyle={styles.row}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View style={[styles.cardWrapper, { width: CARD_WIDTH }]}>
-              <ProjectCard name={item.name} created_at={item.created_at} id="" />
-            </View>
+            <Pressable style={[styles.cardWrapper, { width: CARD_WIDTH }]} onPress={() => onAreaSelected(item.id)} >
+              <ProjectCard name={item.name} created_at={item.created_at} id={item.id} />
+            </Pressable>
           )}
         />
       ) : (

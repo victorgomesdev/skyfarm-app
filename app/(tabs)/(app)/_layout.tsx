@@ -17,6 +17,7 @@ const AppLayout = () => {
             <Stack.Screen name="projects" options={{ headerShown: true, headerTitle: 'Projetos' }} />
             <Stack.Screen name="webview" options={{ headerShown: true, headerTitle: 'Selecione os limites', presentation: 'modal', animation: 'slide_from_right' }} />
             <Stack.Screen name="define_params" options={{ headerShown: true, headerTitle: 'Parâmetros de consulta', presentation: 'modal', animation: 'slide_from_right' }} />
+            <Stack.Screen name="details" options={{headerShown: true, headerTitle: 'Relatório'}}/>
         </Stack>
     )
 }

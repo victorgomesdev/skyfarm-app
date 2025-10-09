@@ -102,12 +102,12 @@ const DefineAreaParams = () => {
 
         setLoading(false)
 
-        // router.navigate({
-        //     pathname: '/areas',
-        //     params: {
-        //         area_id: respose.area_id
-        //     }
-        // })
+        router.navigate({
+            pathname: '/areas',
+            params: {
+                project_id: query?.project_id as string
+            }
+        })
     }
 
     useEffect(() => {
