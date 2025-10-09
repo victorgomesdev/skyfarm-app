@@ -21,6 +21,7 @@ const AreasScreen = () => {
   const [snackBarVisible, setVisible] = useState(false)
   const [modal, setModal] = useState(false)
   const [newArea, setNewArea] = useState('')
+  const [message, setMessage] = useState('')
 
   const client = useClient()
   const translateY = useSharedValue(MODAL_HEIGHT)
@@ -63,21 +64,30 @@ const AreasScreen = () => {
 
     if (!client) return
     (async () => {
-      const { data, error }: any = await client
-        ?.schema('public')
-        .from('areas')
-        .select("id, name, created_at")
-        .eq("project_id", project_id)
 
-      if (error) {
+      try {
+
+        const { data, error }: any = await client
+          .from('areas')
+          .select("id, name, created_at")
+          .eq("project_id", project_id)
+
+        if (error) {
+          setMessage('Ocorreu um erro ao listar as áreas.')
+          setVisible(true)
+          setLoading(false)
+          return
+        }
+        setAreas(data ?? [])
+        setLoading(false)
+        console.log(data)
+      } catch {
         setVisible(true)
         setLoading(false)
         return
       }
-      setAreas(data ?? [])
-      setLoading(false)
     })()
-  }, [client])
+  }, [])
 
   return (
     <Screen>
@@ -89,7 +99,7 @@ const AreasScreen = () => {
           data={areas}
           numColumns={2}
           columnWrapperStyle={styles.row}
-          keyExtractor={(item) => item.name}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={[styles.cardWrapper, { width: CARD_WIDTH }]}>
               <ProjectCard name={item.name} created_at={item.created_at} id="" />

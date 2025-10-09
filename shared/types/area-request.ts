@@ -4,5 +4,6 @@ export type CreateAreaRequest = {
     datefrom: string,
     dateto: string,
     project_id: string,
-    metrics: string[]
+    metrics: string[],
+    aggregation: number
 }

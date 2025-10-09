@@ -8,18 +8,20 @@ import { isAfter, subDays, subYears, differenceInDays } from 'date-fns'
 import Screen from "@/components/Screen"
 import useSession from '@/hooks/useSession'
 import { CreateAreaRequest } from "@/shared/types/area-request"
+import { createNewArea } from '@/shared/utils/create-area'
 import Theme from '@/constants/Theme'
 
 type Metrics = 'NDVI' | 'MOISTURE' | 'TEMP' | 'LAI' | 'PROD'
 
 const DefineAreaParams = () => {
 
-    const [query, setQuery] = useState<CreateAreaRequest>()
+    const [query, setQuery] = useState<Partial<CreateAreaRequest>>()
     const [dateFrom, setFrom] = useState('')
     const [dateTo, setTo] = useState('')
     const [aggregation, setAggregation] = useState(1)
     const [metrics, setMetrics] = useState<Metrics[]>([])
     const [agDiff, setDiff] = useState(0)
+    const [message, setMessage] = useState('')
 
     const [loading, setLoading] = useState(false)
     const [snack, setSnack] = useState(false)
@@ -40,6 +42,7 @@ const DefineAreaParams = () => {
                     } else {
 
                         if (isAfter(dateFrom, date)) {
+                            setMessage('A data inicial não pode ser depois dadata final!')
                             setSnack(true)
                             return
 
@@ -74,14 +77,44 @@ const DefineAreaParams = () => {
 
     }
 
-    useEffect(() => {
-        setQuery({ 
-            name: (params.name as string),
-            coords: (params.coords as string),
-            project_id: (params.project_id as string),
+    const createArea = async (): Promise<void> => {
+
+        setLoading(true)
+        const payload: CreateAreaRequest = {
+            name: query?.name as string,
+            project_id: query?.project_id as string,
             datefrom: dateFrom,
             dateto: dateTo,
-            metrics: []
+            coords: query?.coords as string,
+            metrics: metrics,
+            aggregation: aggregation
+        }
+
+        const { error, respose } = await createNewArea(payload, session?.access_token as string)
+
+        if (error) {
+            setLoading(false)
+            setMessage(error.message)
+            setSnack(true)
+            console.log(error)
+            return
+        }
+
+        setLoading(false)
+
+        // router.navigate({
+        //     pathname: '/areas',
+        //     params: {
+        //         area_id: respose.area_id
+        //     }
+        // })
+    }
+
+    useEffect(() => {
+        setQuery({
+            name: (params.name as string),
+            coords: (params.coords as string),
+            project_id: (params.project_id as string)
         })
     }, [])
 
@@ -178,7 +211,8 @@ const DefineAreaParams = () => {
                     <Button
                         mode='contained'
                         loading={loading}
-                        disabled={metrics.length < 1}
+                        disabled={metrics.length < 1 || loading}
+                        onPress={createArea}
                     >Gerar relatório</Button>
                 </View>
             </ScrollView>
@@ -189,11 +223,14 @@ const DefineAreaParams = () => {
                     bottom: 30,
                 }}
                 visible={snack}
-                onDismiss={() => setSnack(false)}
+                onDismiss={() => {
+                    setSnack(false)
+                    setMessage('')
+                }}
                 action={{
                     label: 'Fechar',
                     onPress: () => setSnack(false)
-                }}>A data final não pode ser antes da inicial!</Snackbar>
+                }}>{message}</Snackbar>
         </Screen>
     )
 }
