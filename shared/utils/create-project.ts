@@ -23,6 +23,7 @@ export async function createNewProject(projectName: string, token: string) {
             error =  'Ocorreu um erro inesperado.'
         })
     } catch (err) {
+        console.log('ERRO ' + err)
         error = err
     }
 

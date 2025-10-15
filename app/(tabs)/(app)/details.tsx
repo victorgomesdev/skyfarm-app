@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
-import { ScrollView, View, StyleSheet, ActivityIndicator, Image } from 'react-native'
-import { Card, Text, Snackbar } from 'react-native-paper'
 import Screen from '@/components/Screen'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import Theme from '@/constants/Theme'
 import useClient from '@/hooks/useClient'
+import { useLocalSearchParams, useRouter } from 'expo-router'
+import { useEffect, useState } from 'react'
+import { Image, ScrollView, StyleSheet, View } from 'react-native'
+import { LineChart } from 'react-native-gifted-charts'
+import { ActivityIndicator, Card, Snackbar, Text } from 'react-native-paper'
 
 interface Metric {
   id: string
@@ -38,7 +40,7 @@ const DetailsScreen = () => {
       .from('areas')
       .select('*')
       .eq('id', area_id)
-      .single() // pega um único registro
+      .single()
 
     if (error) throw new Error('Erro ao buscar a área')
     return data as Area
@@ -112,7 +114,7 @@ const DetailsScreen = () => {
                 <Text style={{ fontWeight: '800' }}>
                   Coordenadas do polígono - Longitude/Latitude:
                 </Text>
-                <Text>{area.coords.coordinates}</Text>
+                <Text>{JSON.stringify(area.coords.coordinates)}</Text>
                 <Text>
                   <Text style={{ fontWeight: '800' }}>Período de observação: </Text>
                   {new Date(area.datefrom).toLocaleDateString()} até {new Date(area.dateto).toLocaleDateString()}
@@ -136,9 +138,40 @@ const DetailsScreen = () => {
                 <Text variant="titleMedium" style={{ fontWeight: 'bold', marginBottom: 4 }}>
                   {metric.name}
                 </Text>
-                <Text variant="bodyMedium" style={{ marginBottom: 8 }}>
-                  Valor: {typeof metric.value === 'object' ? JSON.stringify(metric.value) : metric.value}
-                </Text>
+                {Array.isArray(metric.value) && metric.value.length > 0 ? (
+                  <View style={{ marginVertical: 10 }}>
+                    <LineChart
+                      data={metric.value.map((item) => item.stats.mean)}
+                      data2={metric.value.map((item) => item.stats.min)}
+                      data3={metric.value.map((item) => item.stats.max)}
+                      curved
+                      thickness={2}
+                      hideRules={false}
+                      hideDataPoints={false}
+                      color={Theme.colors?.primary}    // linha média
+                      color2="#4c66afff"               // linha min
+                      color3="#88cc88"                 // linha max
+                      yAxisTextStyle={{ color: '#555' }}
+                      xAxisLabelTextStyle={{ color: '#555', fontSize: 10 }}
+                      noOfSections={4}
+                      spacing={60}
+                      initialSpacing={20}
+                      yAxisLabelTexts={[]}
+                      animateOnDataChange
+                      width={340}
+                      height={220}
+                    />
+
+                    <Text style={{ textAlign: 'center', marginTop: 4, fontStyle: 'italic', color: '#666' }}>
+                      {metric.name}
+                    </Text>
+                  </View>
+                ) : (
+                  <Text variant="bodyMedium" style={{ marginBottom: 8 }}>
+                    Valor: {typeof metric.value === 'object' ? JSON.stringify(metric.value) : metric.value}
+                  </Text>
+                )}
+
 
                 {urls[index] && (
                   <Image

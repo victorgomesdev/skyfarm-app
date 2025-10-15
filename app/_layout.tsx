@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
-import { Stack } from 'expo-router';
-import { Alert } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { PaperProvider } from 'react-native-paper';
 import Theme from '@/constants/Theme';
-import SupabaseProvider from '@/shared/supabase';
 import useAuth from '@/hooks/useAuth';
+import SupabaseProvider from '@/shared/supabase';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { Alert } from 'react-native';
+import { PaperProvider } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
@@ -13,8 +13,8 @@ export default function RootLayout() {
   const { auth } = useAuth()
 
   useEffect(() => {
-    if (!auth) return
     async function doLogin() {
+
       const res = await auth?.signInWithPassword({
         email: "teste@teste.com",
         password: "123456",
