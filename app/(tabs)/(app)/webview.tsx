@@ -10,14 +10,17 @@ import theme from "@/constants/Theme"
 const WebViewScreen = () => {
 
     const [coords, setCoords] = useState<string | null>(null)
+    const [size, setSize] = useState(0)
     const [loaded, setLoaded] = useState(false)
 
     const router = useRouter()
     const params = useLocalSearchParams()
 
     const handleMessage = ({ nativeEvent: { data } }: WebViewMessageEvent): void => {
-        if (data != "null") {
-            setCoords(data)
+        const area = JSON.parse(data)
+        if (area.polygon != "null") {
+            setCoords(JSON.stringify(area.polygon))
+            setSize(area.area)
             return
         }
 
@@ -31,7 +34,8 @@ const WebViewScreen = () => {
             params: {
                 name: params.name,
                 coords: coords,
-                project_id: params.project_id
+                project_id: params.project_id,
+                size: size
             }
         })
     }

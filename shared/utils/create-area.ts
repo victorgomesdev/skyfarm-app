@@ -1,34 +1,37 @@
 import { CreateAreaRequest } from "../types/area-request";
 
 export async function createNewArea(payload: CreateAreaRequest, accessToken: string) {
-
-    let respose!: any
-    let error!: any
-
     try {
-
-        await fetch((process.env.EXPO_PUBLIC_API_URL as string) + '/area/create', {
-            method: 'post',
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/area/create`, {
+            method: 'POST',
             headers: {
                 "Authorization": `Bearer ${accessToken}`,
                 "Content-Type": 'application/json'
             },
             body: JSON.stringify(payload)
-        }).then(async (r) => {
+        });
 
-            const res = await r.json()
-            if (r.status != 201) {
-                error = res
-                respose = false
-            }
+        const data = await response.json();
 
-           respose = res
-           error = false
-        })
+        if (!response.ok || response.status !== 201) {
+            // Erro de requisição
+            return {
+                response: false,
+                error: data?.message || "Erro ao criar área."
+            };
+        }
+
+        // Sucesso
+        return {
+            response: data,
+            error: null
+        };
+
     } catch (err) {
-        error = "Ocorreu um erro, tente novamente."
-        respose = false
+        console.error("Erro na requisição:", err);
+        return {
+            response: false,
+            error: "Ocorreu um erro ao se conectar ao servidor. Tente novamente."
+        };
     }
-
-    return { respose, error }
 }

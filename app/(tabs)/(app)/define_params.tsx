@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react'
-import { StyleSheet, View, ScrollView } from 'react-native'
-import { Button, Card, Snackbar, Text, TextInput, Checkbox } from 'react-native-paper'
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker'
-import Slider from '@react-native-community/slider'
-import { useLocalSearchParams, useRouter } from 'expo-router'
-import { isAfter, subDays, subYears, differenceInDays } from 'date-fns'
 import Screen from "@/components/Screen"
+import Theme from '@/constants/Theme'
 import useSession from '@/hooks/useSession'
 import { CreateAreaRequest } from "@/shared/types/area-request"
 import { createNewArea } from '@/shared/utils/create-area'
-import Theme from '@/constants/Theme'
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker'
+import Slider from '@react-native-community/slider'
+import { differenceInDays, isAfter, subDays, subYears } from 'date-fns'
+import { useLocalSearchParams, useRouter } from 'expo-router'
+import { useEffect, useState } from 'react'
+import { ScrollView, StyleSheet, View } from 'react-native'
+import { Button, Card, Checkbox, Snackbar, Switch, Text, TextInput } from 'react-native-paper'
 
 type Metrics = 'NDVI' | 'MOISTURE' | 'TEMP' | 'LAI' | 'PROD'
 
@@ -22,6 +22,8 @@ const DefineAreaParams = () => {
     const [metrics, setMetrics] = useState<Metrics[]>([])
     const [agDiff, setDiff] = useState(0)
     const [message, setMessage] = useState('')
+    const [saved, setSaved] = useState(false)
+    const [savedName, setSavedName] = useState('')
 
     const [loading, setLoading] = useState(false)
     const [snack, setSnack] = useState(false)
@@ -87,18 +89,22 @@ const DefineAreaParams = () => {
             dateto: dateTo,
             coords: query?.coords as string,
             metrics: metrics,
-            aggregation: aggregation
+            aggregation: aggregation,
+            size: query?.size as number,
+            saved: saved ? true : false,
+            savedName: savedName
         }
 
-        const { error, respose } = await createNewArea(payload, session?.access_token as string)
+        const { response, error } = await createNewArea(payload, session?.access_token as string)
 
         if (error) {
             setLoading(false)
-            setMessage(error.message)
+            setMessage(error)
             setSnack(true)
             console.log(error)
             return
         }
+
 
         setLoading(false)
 
@@ -114,7 +120,8 @@ const DefineAreaParams = () => {
         setQuery({
             name: (params.name as string),
             coords: (params.coords as string),
-            project_id: (params.project_id as string)
+            project_id: (params.project_id as string),
+            size: parseFloat(params.size as string)
         })
     }, [])
 
@@ -126,7 +133,7 @@ const DefineAreaParams = () => {
                     <Card.Content style={{ gap: 10 }}>
                         <View style={styles.adTop}>
                             <Text><Text variant='bodyLarge' style={{ fontWeight: '800' }}>Nome:</Text> {query?.name}</Text>
-                            <Text><Text variant='bodyLarge' style={{ fontWeight: '800' }}>Área(m²):</Text> 0</Text>
+                            <Text><Text variant='bodyLarge' style={{ fontWeight: '800' }}>Área:</Text> {(Number(query?.size) / 1000000).toLocaleString('pt-BR')}km²</Text>
                         </View>
                         <View>
                             <Text variant='bodyLarge' style={{ fontWeight: '800' }}>Coordenadas do polígono - Longitude/Latitude :</Text>
@@ -193,14 +200,26 @@ const DefineAreaParams = () => {
                             disabled={dateFrom == '' || dateTo == ''}
                             status={metrics.includes('LAI') ? 'checked' : 'unchecked'}
                             onPress={() => handleMetricsChange('LAI')} />
-                        <Text>Saúde vegetal / absorção de água - LAI</Text>
+                        <Text>Cobertura vegetal / área verde - LAI</Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Checkbox
                             disabled={dateFrom == '' || dateTo == ''}
                             status={metrics.includes('PROD') ? 'checked' : 'unchecked'}
                             onPress={() => handleMetricsChange('PROD')} />
-                        <Text>Produtividade vegetal / absorção de carbono - PROD</Text>
+                        <Text numberOfLines={2}>Produtividade / absorção de radiação - PROD</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                        <Text variant='titleMedium'>Salvar parâmetros da consulta</Text>
+                        <Switch value={saved} onChange={() => setSaved(!saved)} />
+                    </View>
+                    <View style={{ display: saved ? 'flex' : 'none' }}>
+                        <TextInput
+                            mode="outlined"
+                            label={"Nome"}
+                            value={savedName}
+                            onChangeText={(t) => setSavedName(t)}
+                        />
                     </View>
                 </View>
                 <View style={{
@@ -211,7 +230,7 @@ const DefineAreaParams = () => {
                     <Button
                         mode='contained'
                         loading={loading}
-                        disabled={metrics.length < 1 || loading}
+                        disabled={metrics.length < 1 || loading || (saved && savedName.length < 3)}
                         onPress={createArea}
                     >Gerar relatório</Button>
                 </View>

@@ -5,5 +5,8 @@ export type CreateAreaRequest = {
     dateto: string,
     project_id: string,
     metrics: string[],
-    aggregation: number
+    aggregation: number,
+    size: number,
+    saved: boolean,
+    savedName: string
 }

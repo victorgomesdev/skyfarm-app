@@ -121,7 +121,7 @@ const ProjectsScreen = () => {
           )}
         />
       ) : (
-        <Text>Nenhum projeto encontrado</Text>
+        <Text style={{alignSelf: 'center'}}>Nenhum projeto encontrado</Text>
       )}
 
       <Snackbar

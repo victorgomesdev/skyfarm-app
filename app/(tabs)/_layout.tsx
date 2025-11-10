@@ -19,7 +19,7 @@ const TabLayout = () => {
                 )
             }}>
             <Tabs.Screen name="(app)" />
-            <Tabs.Screen name="new_area" options={{headerShown: true, headerTitle: 'Nova área'}}/>
+            <Tabs.Screen name="saved" options={{ headerTitle: 'Itens salvos'}}/>
         </Tabs>
     )
 }
