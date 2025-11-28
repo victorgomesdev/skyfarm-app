@@ -7,15 +7,15 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+    },
+    "preview": {
+      "distribution": "internal",
       "env": {
         "EXPO_PUBLIC_SB_URL": "https://rtzfklfszvwwyrmoohup.supabase.co",
         "EXPO_PUBLIC_SB_KEY": "sb_publishable_0Tnam3B7Y7c1owBDctiHZw_64lP2R4e",
         "EXPO_PUBLIC_WEBVIEW_URL": "https://skyfarm-webview.vercel.app",
         "EXPO_PUBLIC_API_URL": "https://skyfarm-api.onrender.com/api"
       }
-    },
-    "preview": {
-      "distribution": "internal"
     },
     "production": {
       "autoIncrement": true
