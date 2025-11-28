@@ -1,9 +1,9 @@
-import { createContext, PropsWithChildren, useEffect, useState } from 'react';
-import { AppState } from 'react-native';
-import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
+import { useRouter } from 'expo-router';
+import { createContext, PropsWithChildren, useEffect, useState } from 'react';
+import { AppState } from 'react-native';
 
 type SupabaseCtx = {
   client: SupabaseClient | null;
@@ -56,27 +56,30 @@ const SupabaseProvider = ({ children }: PropsWithChildren) => {
       } catch (err: any) {
         setSession(null);
         setLoading(false);
-        //navigation.replace('/login')
+        navigation.replace('/login')
       }
     };
 
     checkInitialSession();
 
     const { data: { subscription } } = sp.auth.onAuthStateChange((event, session) => {
-
+      console.log('Auth event:', session);
       switch (event) {
         case 'INITIAL_SESSION':
         case 'SIGNED_IN':
         case 'TOKEN_REFRESHED':
-          setSession(session);
-          setLoading(false);
-          break;
+          if (session?.access_token){
+            setSession(session);
+            setLoading(false);
+            navigation.replace('/(tabs)/(app)/projects');
+            break;
+          }
         case 'SIGNED_OUT':
         case 'USER_UPDATED':
         case 'PASSWORD_RECOVERY':
           setSession(null);
           setLoading(false);
-          //navigation.replace('/login');
+          navigation.replace('/login');
           break;
       }
     });
@@ -94,7 +97,7 @@ const SupabaseProvider = ({ children }: PropsWithChildren) => {
           setSession(data.session);
         } catch (err: any) {
           setSession(null);
-          //navigation.replace('/login');
+          navigation.replace('/login');
         }
       }
     });

@@ -1,11 +1,11 @@
+import React, { useEffect, useState } from 'react'
+import { Dimensions, FlatList, Modal, StyleSheet, View } from 'react-native'
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { ActivityIndicator, Button, Card, Snackbar, Text, TextInput, useTheme } from 'react-native-paper'
+import { useRouter } from "expo-router"
+import { FontAwesome } from '@expo/vector-icons'
 import Screen from "@/components/Screen"
 import useClient from '@/hooks/useClient'
-import { FontAwesome } from '@expo/vector-icons'
-import { useRouter } from "expo-router"
-import { useEffect, useState, useCallback } from 'react'
-import { Dimensions, FlatList, Modal, StyleSheet, View } from 'react-native'
-import { ActivityIndicator, Button, Card, Snackbar, Text, TextInput, useTheme } from 'react-native-paper'
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 
 import { useFocusEffect } from '@react-navigation/native'
 
@@ -70,7 +70,7 @@ const SavedQueriesScreen = () => {
                 setMessage('Ocorreu um erro ao carregar os itens.')
                 return
             }
-            
+
             setItems(data)
         } catch {
             setMessage('Ocorreu um erro ao carregar os itens.')
@@ -78,11 +78,12 @@ const SavedQueriesScreen = () => {
             setLoading(false)
         }
     }
-    const focused = useCallback(loadSavedItems, [])
     
-    useEffect(() => {
-        focused()
-    }, [])
+    useFocusEffect(
+        React.useCallback(() => {
+            loadSavedItems()
+        }, [])
+    )
 
     return (
         <View style={{ flex: 1 }}>
@@ -209,7 +210,7 @@ const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 15,
         paddingVertical: 14,
-        position: 'absolute', // 'fixed' não existe no RN
+        position: 'absolute',
         top: 0,
         width: '100%',
         zIndex: 2

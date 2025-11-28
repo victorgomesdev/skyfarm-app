@@ -11,7 +11,7 @@ const TabBar = (props: BottomTabBarProps) => {
   const tabs = [
     { name: '(app)', label: 'Projetos', icon: 'map' as const },
     { name: 'saved', label: 'Salvos', icon: 'bookmark' as const },
-    { name: 'settings', label: 'Config', icon: 'gear' as const },
+    { name: 'profile', label: 'Perfil', icon: 'user' as const },
   ];
 
   return (

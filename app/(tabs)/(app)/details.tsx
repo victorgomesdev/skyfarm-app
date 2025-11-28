@@ -36,7 +36,6 @@ type Stats = {
   }
 }
 
-// Mapeamento de nomes e unidades
 const metricLabels: Record<string, { label: string; unit: string }> = {
   moisture: { label: 'Umidade do Solo', unit: '' },
   lai: { label: 'Índice de Cobertura de Folhagem', unit: 'm²/m²' },
@@ -108,7 +107,6 @@ const DetailsScreen = () => {
   return (
     <Screen>
       <ScrollView contentContainerStyle={styles.container}>
-        {/* Detalhes da Área */}
         <Card style={styles.areaCard}>
           <Card.Title title="Detalhes da Área" titleVariant="headlineSmall" />
           <Card.Content style={{ gap: 10 }}>
@@ -122,7 +120,7 @@ const DetailsScreen = () => {
                 </Text>
                 <Text>
                   <Text style={{ fontWeight: '800' }}>Área: </Text>
-                  {(area.size /1000000).toLocaleString('pt-BR')}km²
+                  {(area.size / 1000000).toLocaleString('pt-BR')}km²
                 </Text>
                 <Text style={{ fontWeight: '800' }}>
                   Coordenadas do polígono - Longitude/Latitude:
@@ -139,7 +137,6 @@ const DetailsScreen = () => {
           </Card.Content>
         </Card>
 
-        {/* Métricas */}
         <Text variant="titleLarge" style={{ marginVertical: 10 }}>
           Relatório:
         </Text>
@@ -152,7 +149,16 @@ const DetailsScreen = () => {
             const metricLabel = metricLabels[metricKey]?.label ?? metric.name
             const unit = metricLabels[metricKey]?.unit ?? ''
             const statsList = metric.value || []
-
+            const max = statsList.sort((a, b) => b.stats.max - a.stats.max).slice(-1)[0]?.stats.max || 1
+            const statsNums = statsList.map((v) => Number(v.stats.max) || 0)
+            const maxValue = Math.max(...statsNums, 1)
+            const sections = 5
+            const stepValue = (() => {
+              const raw = maxValue / sections
+              if (raw <= 0.1) return 0.1
+              const magnitude = Math.pow(10, Math.floor(Math.log10(raw)))
+              return Math.ceil(raw / magnitude) * magnitude
+            })()
             return (
               <Card key={metric.id} style={styles.metricCard}>
                 <Card.Title
@@ -162,7 +168,6 @@ const DetailsScreen = () => {
                 />
                 <Card.Content>
                   {statsList.length > 2 ? (
-                    // --- Exibe gráfico se houver dados suficientes ---
                     <View style={{ marginVertical: 10, minHeight: 250 }}>
                       <LineChart
                         data={statsList.map((item) => ({
@@ -189,12 +194,9 @@ const DetailsScreen = () => {
                         verticalLinesColor="#ddd"
                         xAxisLabelTextStyle={{ fontSize: 12, color: '#333', textAlign: 'center' }}
                         yAxisTextStyle={{ fontSize: 12, color: '#333' }}
-                        noOfSections={5}
-                        stepValue={0.1}
-                        maxValue={Math.max(
-                          ...statsList.map((v) => Number(v.stats.max) || 0),
-                          1
-                        )}
+                        noOfSections={sections}
+                        stepValue={stepValue}
+                        maxValue={maxValue}
                         scrollToEnd={statsList.length > 5}
                       />
                       <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 8, gap: 16 }}>
@@ -204,7 +206,6 @@ const DetailsScreen = () => {
                       </View>
                     </View>
                   ) : (
-                    // --- Exibe versão direta se poucos dados ---
                     <View style={{ marginVertical: 10, gap: 10 }}>
                       {statsList.map((item, i) => (
                         <Card key={i} mode="outlined" style={{ backgroundColor: '#fafafa' }}>
@@ -238,7 +239,6 @@ const DetailsScreen = () => {
         )}
       </ScrollView>
 
-      {/* Snackbar de erro */}
       <Snackbar
         style={styles.snackbar}
         visible={!!message}

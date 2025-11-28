@@ -3,38 +3,42 @@ import useAuth from '@/hooks/useAuth';
 import SupabaseProvider from '@/shared/supabase';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import { Alert } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
 
-  const { auth } = useAuth()
+  const PublicNavigator = () => {
+    return (
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name='login' />
+        <Stack.Screen name='signin' />
+      </Stack>
+    )
+  }
 
-  useEffect(() => {
-    async function doLogin() {
+  const PrivateNavigator = () => {
+    return (
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name='(tabs)' />
+      </Stack>
+    )
+  }
 
-      const res = await auth?.signInWithPassword({
-        email: "teste@teste.com",
-        password: "123456",
-      })
+  const AppNavigator = () => {
 
-      if (res?.error) Alert.alert('erro', res.error.cause as string)
-    }
+    const { session } = useAuth()
 
-    doLogin()
-  }, [auth])
+    return (
+      session ? <PrivateNavigator /> : <PublicNavigator />
+    )
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <SupabaseProvider>
         <PaperProvider theme={Theme}>
-          <Stack screenOptions={{
-            headerShown: false
-          }}>
-            <Stack.Screen name='(tabs)' />
-          </Stack>
+          <AppNavigator />
         </PaperProvider>
         <StatusBar backgroundColor={Theme.colors?.primary} style='auto' />
       </SupabaseProvider>
