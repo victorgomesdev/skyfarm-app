@@ -97,7 +97,7 @@ const SupabaseProvider = ({ children }: PropsWithChildren) => {
           setSession(data.session);
         } catch (err: any) {
           setSession(null);
-          navigation.replace('/login');
+          //navigation.replace('/login');
         }
       }
     });

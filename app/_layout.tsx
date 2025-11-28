@@ -30,7 +30,7 @@ export default function RootLayout() {
     const { session } = useAuth()
 
     return (
-      session ? <PrivateNavigator /> : <PublicNavigator />
+      session == null ? <PublicNavigator /> : <PrivateNavigator />
     )
   }
 
